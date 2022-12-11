@@ -66,8 +66,8 @@ def evaluate(model: TranslationModel, val_dataloader, device, loss_fn, pad_token
     
     with torch.no_grad():
         for batch in tqdm(val_dataloader):
-            X, y = batch[:, 0], batch[:, 1]
-            X, y = torch.tensor(X, dtype=torch.long, device=device), torch.tensor(y, dtype=torch.long, device=device)
+            X, y = torch.tensor(batch[0]), torch.tensor(batch[1])
+            X, y = X.to(device), y.to(device)
 
             # Now we shift the tgt by one so with the <SOS> we predict the token at pos 1
             y_input = y[:,:-1]
