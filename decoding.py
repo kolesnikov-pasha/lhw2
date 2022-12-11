@@ -100,4 +100,17 @@ def translate(
     :param translation_mode: either "greedy", "beam" or anything more advanced
     :param device: device that the model runs on
     """
-    pass
+    if translation_mode == "beam":
+        raise NotImplementedError()
+    
+    src = []
+    pad_token_src = src_tokenizer.encode(SpecialTokens.PADDING).ids[0].item()
+    max_size = 0
+    for sentense in src_sentences:
+        src_tokens = src_tokenizer.encode(sentense).ids
+        src.append(src_tokens)
+        max_size = max(max_size, len(src_tokens))
+    for i in range(len(src)):
+        src[i] = src[i] + [pad_token_src] * (max_size - len(src[i]))
+    src = torch.tensor(src).to(device)
+    _greedy_decode(model, src, 50, src_tokenizer, tgt_tokenizer, device)
