@@ -28,7 +28,9 @@ def train_epoch(
     model.train()
     total_loss = 0
 
-    for batch in tqdm(train_dataloader):
+    for i, batch in tqdm(enumerate(train_dataloader)):
+        if i > 100:
+            break
         X, y = torch.tensor(batch[0]), torch.tensor(batch[1])
         X, y = X.to(device), y.to(device)
 

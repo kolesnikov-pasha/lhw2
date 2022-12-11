@@ -134,7 +134,15 @@ class TranslationDataset(Dataset):
 def train_tokenizer(train_file: Path, validation_file: Path, save_dir):
     tokenizer = Tokenizer(BPE())
     tokenizer.pre_tokenizer = Whitespace()
-    trainer = BpeTrainer(special_tokens=["[UNK]", "[CLS]", "[SEP]", "[PAD]", "[MASK]"], show_progress=True, vocab_size=30000)
+    trainer = BpeTrainer(special_tokens=[
+        SpecialTokens.UNKNOWN.value, 
+        "[CLS]", 
+        "[SEP]", 
+        SpecialTokens.PADDING.value, 
+        "[MASK]", 
+        SpecialTokens.BEGINNING.value, 
+        SpecialTokens.END.value
+        ], show_progress=True, vocab_size=30000)
     tokenizer.train(files=[str(train_file.absolute()), str(validation_file.absolute())], trainer=trainer)
     tokenizer.save(str(save_dir))
 
