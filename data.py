@@ -11,6 +11,13 @@ from torch.utils.data import Dataset
 from tqdm import tqdm
 
 
+class SpecialTokens(Enum):
+    UNKNOWN = "[UNK]"
+    PADDING = "[PAD]"
+    BEGINNING = "[BOS]"
+    END = "[EOS]"
+
+
 def process_training_file(input_path: Path, output_path: Path):
     result = {}
     with open(input_path, "r") as source:
@@ -26,7 +33,7 @@ def process_training_file(input_path: Path, output_path: Path):
         for i in range(max_index):
             texts = result.get(i + 1, "").split("\n")
             for text in texts:
-                output.write(f"{text.strip()}\n")
+                output.write(f"{SpecialTokens.BEGINNING.value} {text.strip()} {SpecialTokens.END.value}\n")
 
 def process_evaluation_file(input_path: Path, output_path: Path):
     result = []
@@ -34,7 +41,7 @@ def process_evaluation_file(input_path: Path, output_path: Path):
         html = bs.BeautifulSoup(source)
         for doc in html.find_all("doc"):
             for seg in doc.find_all("seg"):
-                result.append(seg.string + "\n")
+                result.append(f"{SpecialTokens.BEGINNING.value} {seg.string} {SpecialTokens.END.value}\n")
     with open(output_path, "w") as output:
         output.writelines(result)
 
@@ -59,13 +66,6 @@ def convert_files(base_path: Path, output_path: Path):
             base_path / f"IWSLT17.TED.tst2010.de-en.{language}.xml",
             output_path / f"test.{language}.txt",
         )
-
-
-class SpecialTokens(Enum):
-    UNKNOWN = "[UNK]"
-    PADDING = "[PAD]"
-    BEGINNING = "[BOS]"
-    END = "[EOS]"
 
 
 class TranslationDataset(Dataset):
